@@ -84,8 +84,3 @@ class AmazonReviewerScraper
 		return reviewer
 	end
 end
-
-
-# parser = AmazonReviewerScraper.new("http://www.amazon.co.uk")
-# parser.ParseTopReviewersPage(1)
-# puts parser.reviewers
