@@ -2,11 +2,13 @@ require 'nokogiri'
 require 'open-uri'
 
 class AmazonReviewerScraper
+	attr_reader :reviewers
 
 	def initialize(baseUrl)
 		@baseUrl = baseUrl
 		@maxPages = 1
 		@numPages = 1
+		@reviewers = Array.new
 
 		@reviewPageUrl = @baseUrl + "/review/top-reviewers?page="
 	end
@@ -22,7 +24,9 @@ class AmazonReviewerScraper
 		links = links.compact!.uniq
 
 		# Follow each reviewer link and parse their data
-		links.each{ |link| ParseReviewerPage(@baseUrl + link)}
+		links.each{ |link|
+			@reviewers.push(ParseReviewerPage(@baseUrl + link))
+		}
 
 		# TODO: Flush a page at a time to a CSV file or similar
 
@@ -35,13 +39,12 @@ class AmazonReviewerScraper
 
 	end
 
-	private
 	def ParseReviewerPage(pageUrl)
 
 		data = Nokogiri::HTML(open(pageUrl))
 
 		reviewer = Hash.new()
-		reviewer["amazonUrl"] = pageUrl
+		reviewer["url"] = pageUrl
 
 		# Name
 		reviewer["name"] = data.xpath("//*/h1/span").text
@@ -78,10 +81,11 @@ class AmazonReviewerScraper
 		end
 		reviewer["interests"] = interests
 
-		puts reviewer.to_s
+		return reviewer
 	end
 end
 
 
-parser = AmazonReviewerScraper.new("http://www.amazon.co.uk")
-parser.ParseTopReviewersPage(1)
+# parser = AmazonReviewerScraper.new("http://www.amazon.co.uk")
+# parser.ParseTopReviewersPage(1)
+# puts parser.reviewers
