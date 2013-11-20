@@ -4,9 +4,10 @@ require 'open-uri'
 class AmazonReviewerScraper
 	attr_reader :reviewers
 
-	def initialize(baseUrl)
-		@baseUrl = baseUrl
-		@maxPages = 1
+	def initialize(params = {})
+
+		@baseUrl = params.fetch(:baseUrl, 'http://www.amazon.com')
+		@maxPages = params.fetch(:maxPages, 1)
 		@numPages = 1
 		@reviewers = Array.new
 
@@ -27,8 +28,6 @@ class AmazonReviewerScraper
 		links.each{ |link|
 			@reviewers.push(ParseReviewerPage(@baseUrl + link))
 		}
-
-		# TODO: Flush a page at a time to a CSV file or similar
 
 		@numPages += 1
 

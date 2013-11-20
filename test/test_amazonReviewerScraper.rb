@@ -4,7 +4,7 @@ require_relative '../lib/amazonReviewerScraper'
 class AmazonReviewerScraperTests < Test::Unit::TestCase
 
 	def setup
-		@parser = AmazonReviewerScraper.new("http://www.amazon.co.uk")
+		@parser = AmazonReviewerScraper.new(:baseUrl => "http://www.amazon.co.uk")
 	end
 
 	def test_expectCorrectNameWhenPresent()
