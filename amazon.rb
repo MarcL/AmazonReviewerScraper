@@ -38,40 +38,37 @@ class AmazonReviewerParser
 	private
 	def ParseReviewerPage(pageUrl)
 
-		puts pageUrl
 		data = Nokogiri::HTML(open(pageUrl))
 
+		reviewer = Hash.new()
+		reviewer["amazonUrl"] = pageUrl
+
 		# Name
-		name = data.xpath("//*/h1/span").text
-		puts "Name: " + name
+		reviewer["name"] = data.xpath("//*/h1/span").text
 
 		# Birthday!
-		birthday = data.xpath("//*[@id=\"pdpLeftColumn\"]/div[2]/div[2]/span").text
-		puts "Birthday: " + birthday
+		reviewer["birthday"] = data.xpath("//*[@id=\"pdpLeftColumn\"]/div[2]/div[2]/span").text
 
 		# Ranking info
-		ranking = data.xpath("//*[@id=\"pdpLeftColumn\"]/div[1]/div[3]/div[1]/b/a").text
-		puts "Ranking: " + ranking
+		reviewer["ranking"] = data.xpath("//*[@id=\"pdpLeftColumn\"]/div[1]/div[3]/div[1]/b/a").text
 
 		# Location
 		location = data.xpath("//*[@id=\"pdpLeftColumn\"]/div[2]/div[1]").text
 		location.slice! "Location:"
-		puts "Location: " + location
+		reviewer["location"] = location
 
 		# Email
 		# Some email addresses have hidden spaces to avoid scrapers
 		# Hence let's take it from the mailto: HREF instead!
 		email = data.xpath("//*[@id=\"pdpLeftColumn\"]/div[2]/div[2]/span/a/@href").text
 		email.slice! "mailto:"
-		puts "Email: " + email
+		reviewer["email"] = email
 
 		# Website
-		website = data.xpath("//*[@id=\"pdpLeftColumn\"]/div[2]/div[3]/span/a").text
-		puts "Website: " + website
+		reviewer["website"] = data.xpath("//*[@id=\"pdpLeftColumn\"]/div[2]/div[3]/span/a").text
 
 		# Own words
-		ownWords = data.xpath("//*[@id=\"pdpLeftColumn\"]/div[2]/div[3]/div[2]").text
-		puts "Own words: " + ownWords
+		reviewer["ownWords"] = data.xpath("//*[@id=\"pdpLeftColumn\"]/div[2]/div[3]/div[2]").text
 
 		# Interests
 		# Check the pop-up first as it's the longer version
@@ -79,7 +76,9 @@ class AmazonReviewerParser
 		if (interests.nil? or interests.empty?)
 			interests = data.xpath("//*[@id=\"interestsTags\"]/div/div/div/div/div[1]").text
 		end
-		puts "Interests: " + interests
+		reviewer["interests"] = interests
+
+		puts reviewer.to_s
 	end
 end
 
