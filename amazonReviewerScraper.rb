@@ -1,7 +1,7 @@
 require 'nokogiri'
 require 'open-uri'
 
-class AmazonReviewerParser
+class AmazonReviewerScraper
 
 	def initialize(baseUrl)
 		@baseUrl = baseUrl
@@ -83,5 +83,5 @@ class AmazonReviewerParser
 end
 
 
-parser = AmazonReviewerParser.new("http://www.amazon.co.uk")
+parser = AmazonReviewerScraper.new("http://www.amazon.co.uk")
 parser.ParseTopReviewersPage(1)
