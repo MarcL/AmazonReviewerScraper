@@ -27,4 +27,18 @@ class AmazonReviewerScraperTests < Test::Unit::TestCase
 
 		assert_equal(reviewer["url"], pageUrl)
 	end
+
+	def test_expectCorrectRanking()
+		pageUrl = "test/fixtures/reviewer-rank1.html"
+		reviewer = @parser.ParseReviewerPage(pageUrl)
+
+		assert_equal(reviewer["ranking"], "1")
+	end
+
+	def test_expectEmptyStringWhenRankingNotPresent()
+		pageUrl = "test/fixtures/reviewer-nodata.html"
+		reviewer = @parser.ParseReviewerPage(pageUrl)
+
+		assert_equal(reviewer["ranking"], "")
+	end
 end
