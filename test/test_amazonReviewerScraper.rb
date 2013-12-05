@@ -41,4 +41,11 @@ class AmazonReviewerScraperTests < Test::Unit::TestCase
 
 		assert_equal(reviewer["ranking"], "")
 	end
+
+	def test_expectCorrectReviewPageUrlWhenPageNumberIs1()
+		asin = "B0050CJNO2"
+		pageNum = 1
+		expectedUrl = "http://www.amazon.co.uk/product-reviews/B0050CJNO2/?pageNumber=1"
+		assert_equal(expectedUrl, @parser.GetProductReviewPage(asin, pageNum))
+	end
 end

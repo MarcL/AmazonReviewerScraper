@@ -12,6 +12,7 @@ class AmazonReviewerScraper
 		@reviewers = Array.new
 
 		@reviewPageUrl = @baseUrl + "/review/top-reviewers?page="
+		@productReviewsPageUrl = @baseUrl + "/product-reviews/%s/?pageNumber=%d"
 	end
 
 	def ParseTopReviewersPage(pageNum)
@@ -81,5 +82,13 @@ class AmazonReviewerScraper
 		reviewer["interests"] = interests
 
 		return reviewer
+	end
+
+	def ParseASINReviews(asin)
+		# http://www.amazon.co.uk/product-reviews/B0050CJNO2/?pageNumber=2
+	end
+
+	def GetProductReviewPage(asin, pageNumber = 1)
+		sprintf(@productReviewsPageUrl, asin, pageNumber)
 	end
 end
