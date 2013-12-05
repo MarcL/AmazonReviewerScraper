@@ -10,6 +10,7 @@ class AmazonReviewerScraper
 		@baseUrl = params.fetch(:baseUrl, 'http://www.amazon.com')
 		@maxPages = params.fetch(:maxPages, 1)
 		@followNextLink = params.fetch(:followNextLink, true)
+		@parseReviewer = params.fetch(:parseReviewer, true)
 		@numPages = 1
 		@reviewers = Array.new
 		@reviews = Array.new
@@ -108,7 +109,12 @@ class AmazonReviewerScraper
 			# Trim to first word (i.e. the rating) and return it as a float
 			review["numStars"] = reviewNode.xpath("./div[2]/span[1]/span/span").text.split(' ')[0...1].join('').to_f
 
+			# Need to check if "x of x people found this review helpful text is used"
 			review["name"] = reviewNode.xpath("./div[3]/div[1]/div[2]/a[1]/span").text
+			if (review["name"].empty?)
+				# If we're here then no helpful text was found so need a different xpath link
+				review["name"] = reviewNode.xpath("./div[2]/div[1]/div[2]/a[1]/span").text
+			end
 			review["reviewerAmazonUrl"] = reviewNode.xpath("./div[3]/div[1]/div[2]/a[1]/@href").text
 			review["reviewTitle"] = reviewNode.xpath("./div[2]/span[2]/b").text
 			review["reviewDate"] = reviewNode.xpath("./div[2]/span[2]/nobr").text
@@ -117,7 +123,9 @@ class AmazonReviewerScraper
 			review["review"] = reviewNode.xpath("./text()").text.strip!
 
 			# Follow link to Amazon reviewer page to get email address
-			review["reviewer"] = ParseReviewerPage(@baseUrl + review["reviewerAmazonUrl"])
+			if (@parseReviewer)
+				review["reviewer"] = ParseReviewerPage(@baseUrl + review["reviewerAmazonUrl"])
+			end
 
 			@reviews.push(review)
 		end

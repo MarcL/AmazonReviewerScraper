@@ -80,4 +80,13 @@ class AmazonReviewerScraperTests < Test::Unit::TestCase
 		expectedNumReviewers = 8
 		assert_equal(expectedNumReviewers, reviews.length)
 	end
+
+	def test_expectAllReviewerNameWhenScrapeProductReviewersScrapesPage2WithoutFollowingLinks()
+		parser = AmazonReviewerScraper.new(:baseUrl => "http://www.amazon.co.uk", :followNextLink => false, :parseReviewer => false)
+		pageUrl = "test/fixtures/B00GJTV0J6-product-reviews-page-2.html"
+		parser.ScrapeProductReviewers(pageUrl)
+		reviews = parser.reviews
+		assert_equal("S Ebert", reviews[6]["name"])
+		assert_equal("DMJones", reviews[7]["name"])
+	end
 end
