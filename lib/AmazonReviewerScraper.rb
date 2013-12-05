@@ -9,6 +9,7 @@ class AmazonReviewerScraper
 
 		@baseUrl = params.fetch(:baseUrl, 'http://www.amazon.com')
 		@maxPages = params.fetch(:maxPages, 1)
+		@followNextLink = params.fetch(:followNextLink, true)
 		@numPages = 1
 		@reviewers = Array.new
 		@reviews = Array.new
@@ -117,9 +118,24 @@ class AmazonReviewerScraper
 			review["text"] = reviewNode.xpath("./text()").text.strip!
 
 			# Follow link to Amazon reviewer page to get email address
-			review["reviewer"] = ParseReviewerPage(@baseUrl + review["authorAmazonUrl"])
+			# review["reviewer"] = ParseReviewerPage(@baseUrl + review["authorAmazonUrl"])
 
 			@reviews.push(review)
+		end
+
+		# Go to next page of reviews if there is one
+		if (@followNextLink)
+			paginationLinks = data.xpath("//table[@class=\"CMheadingBar\"][position()=1]/tr/td/div[@class=\"CMpaginate\"]/span[@class=\"paging\"]/a")
+
+			# Determine if last link is next
+			nextPageNode = paginationLinks[paginationLinks.length - 1]
+
+			if (nextPageNode.text.include? "Next")
+				nextPageUrl = nextPageNode.xpath("./@href").text
+				if (!nextPageUrl.empty?)
+					ScrapeProductReviewers(nextPageUrl)
+				end
+			end
 		end
 	end
 

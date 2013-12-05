@@ -56,11 +56,28 @@ class AmazonReviewerScraperTests < Test::Unit::TestCase
 		assert_equal(expectedUrl, @parser.GetProductReviewPage(asin, pageNum))
 	end
 
-	def test_expectScrapeProductReviewersToRetrieve10Reviewers()
+	def test_expectScrapeProductReviewersToRetrieve10ReviewersFromPage1WithoutFollowingLinks()
+		parser = AmazonReviewerScraper.new(:baseUrl => "http://www.amazon.co.uk", :followNextLink => false)
+		pageUrl = "test/fixtures/B00GJTV0J6-product-reviews-page-1.html"
+		parser.ScrapeProductReviewers(pageUrl)
+		reviews = parser.reviews
+		expectedNumReviewers = 10
+		assert_equal(expectedNumReviewers, reviews.length)
+	end
+
+	def test_expectScrapeProductReviewersToRetrieve10ReviewersFromPage1WithFollowingLinks()
 		pageUrl = "test/fixtures/B00GJTV0J6-product-reviews-page-1.html"
 		@parser.ScrapeProductReviewers(pageUrl)
 		reviews = @parser.reviews
-		expectedNumReviewers = 10
-		assert_equal(reviews.length, expectedNumReviewers)
+		expectedNumReviewers = 18
+		assert_equal(expectedNumReviewers, reviews.length)
+	end
+
+	def test_expectScrapeProductReviewersToRetrieve8ReviewersFromPage2WithoutFollowingLinks()
+		pageUrl = "test/fixtures/B00GJTV0J6-product-reviews-page-2.html"
+		@parser.ScrapeProductReviewers(pageUrl)
+		reviews = @parser.reviews
+		expectedNumReviewers = 8
+		assert_equal(expectedNumReviewers, reviews.length)
 	end
 end
