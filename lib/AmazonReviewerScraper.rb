@@ -88,8 +88,7 @@ class AmazonReviewerScraper
 	end
 
 	def ParseASINReviews(asin, pageNumber = 1)
-
-		# Get review page
+		# Get review page URL
 		pageUrl = GetProductReviewPage(asin, pageNumber)
 
 		# Scrape reviewers
@@ -109,16 +108,16 @@ class AmazonReviewerScraper
 			# Trim to first word (i.e. the rating) and return it as a float
 			review["numStars"] = reviewNode.xpath("./div[2]/span[1]/span/span").text.split(' ')[0...1].join('').to_f
 
-			review["author"] = reviewNode.xpath("./div[3]/div[1]/div[2]/a[1]/span").text
-			review["authorAmazonUrl"] = reviewNode.xpath("./div[3]/div[1]/div[2]/a[1]/@href").text
+			review["name"] = reviewNode.xpath("./div[3]/div[1]/div[2]/a[1]/span").text
+			review["reviewerAmazonUrl"] = reviewNode.xpath("./div[3]/div[1]/div[2]/a[1]/@href").text
 			review["reviewTitle"] = reviewNode.xpath("./div[2]/span[2]/b").text
 			review["reviewDate"] = reviewNode.xpath("./div[2]/span[2]/nobr").text
 			review["verifiedPurchase"] = (!reviewNode.xpath("./div[4]/span/b").text.empty?).to_s
 
-			review["text"] = reviewNode.xpath("./text()").text.strip!
+			review["review"] = reviewNode.xpath("./text()").text.strip!
 
 			# Follow link to Amazon reviewer page to get email address
-			# review["reviewer"] = ParseReviewerPage(@baseUrl + review["authorAmazonUrl"])
+			review["reviewer"] = ParseReviewerPage(@baseUrl + review["reviewerAmazonUrl"])
 
 			@reviews.push(review)
 		end
