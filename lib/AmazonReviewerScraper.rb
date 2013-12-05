@@ -107,7 +107,11 @@ class AmazonReviewerScraper
 
 			# Star rating - e.g. 5.0 out of 5 stars
 			# Trim to first word (i.e. the rating) and return it as a float
-			review["numStars"] = reviewNode.xpath("./div[2]/span[1]/span/span").text.split(' ')[0...1].join('').to_f
+			starsText = reviewNode.xpath("./div[2]/span[1]/span/span").text
+			if (starsText.empty?)
+				starsText = reviewNode.xpath("./div[1]/span[1]/span").text
+			end
+			review["numStars"] = starsText.split(' ')[0...1].join('').to_f
 
 			# Need to check if "x of x people found this review helpful text is used"
 			review["name"] = reviewNode.xpath("./div[3]/div[1]/div[2]/a[1]/span").text
@@ -115,10 +119,26 @@ class AmazonReviewerScraper
 				# If we're here then no helpful text was found so need a different xpath link
 				review["name"] = reviewNode.xpath("./div[2]/div[1]/div[2]/a[1]/span").text
 			end
+
 			review["reviewerAmazonUrl"] = reviewNode.xpath("./div[3]/div[1]/div[2]/a[1]/@href").text
+			if (review["reviewerAmazonUrl"].empty?)
+				review["reviewerAmazonUrl"] = reviewNode.xpath("./div[2]/div[1]/div[2]/a[1]/@href").text
+			end
+
 			review["reviewTitle"] = reviewNode.xpath("./div[2]/span[2]/b").text
+			if (review["reviewTitle"].empty?)
+				review["reviewTitle"] = reviewNode.xpath("./div[1]/span[2]/b").text
+			end
+
 			review["reviewDate"] = reviewNode.xpath("./div[2]/span[2]/nobr").text
+			if (review["reviewDate"].empty?)
+				review["reviewDate"] = reviewNode.xpath("./div[1]/span[2]/nobr").text
+			end
+			
 			review["verifiedPurchase"] = (!reviewNode.xpath("./div[4]/span/b").text.empty?).to_s
+			if (review["verifiedPurchase"].empty?)
+				review["verifiedPurchase"] = (!reviewNode.xpath("./div[3]/span/b").text.empty?).to_s
+			end
 
 			review["review"] = reviewNode.xpath("./text()").text.strip!
 

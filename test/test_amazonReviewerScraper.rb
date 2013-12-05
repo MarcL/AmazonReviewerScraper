@@ -4,7 +4,7 @@ require_relative '../lib/amazonReviewerScraper'
 class AmazonReviewerScraperTests < Test::Unit::TestCase
 
 	def setup
-		@parser = AmazonReviewerScraper.new(:baseUrl => "http://www.amazon.co.uk")
+		@parser = AmazonReviewerScraper.new(:baseUrl => "http://www.amazon.co.uk", :followNextLink => false, :parseReviewer => false)
 	end
 
 	def test_expectCorrectNameWhenPresent()
@@ -66,9 +66,10 @@ class AmazonReviewerScraperTests < Test::Unit::TestCase
 	end
 
 	def test_expectScrapeProductReviewersToRetrieve10ReviewersFromPage1WithFollowingLinks()
+		parser = AmazonReviewerScraper.new(:baseUrl => "http://www.amazon.co.uk", :followNextLink => true)
 		pageUrl = "test/fixtures/B00GJTV0J6-product-reviews-page-1.html"
-		@parser.ScrapeProductReviewers(pageUrl)
-		reviews = @parser.reviews
+		parser.ScrapeProductReviewers(pageUrl)
+		reviews = parser.reviews
 		expectedNumReviewers = 18
 		assert_equal(expectedNumReviewers, reviews.length)
 	end
