@@ -118,12 +118,9 @@ class AmazonReviewerScraper
 
 			# Follow link to Amazon reviewer page to get email address
 			review["reviewer"] = ParseReviewerPage(@baseUrl + review["authorAmazonUrl"])
-			puts review
 
 			@reviews.push(review)
 		end
-
-		# TODO: Go to next page of reviews
 	end
 
 	def GetProductReviewPage(asin, pageNumber = 1)
