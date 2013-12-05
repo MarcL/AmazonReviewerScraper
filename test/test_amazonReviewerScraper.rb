@@ -55,4 +55,12 @@ class AmazonReviewerScraperTests < Test::Unit::TestCase
 		expectedUrl = "http://www.amazon.co.uk/product-reviews/" + asin + "/?pageNumber=" + pageNum.to_s
 		assert_equal(expectedUrl, @parser.GetProductReviewPage(asin, pageNum))
 	end
+
+	def test_expectScrapeProductReviewersToRetrieve10Reviewers()
+		pageUrl = "test/fixtures/B00GJTV0J6-product-reviews-page-1.html"
+		@parser.ScrapeProductReviewers(pageUrl)
+		reviews = @parser.reviews
+		expectedNumReviewers = 10
+		assert_equal(reviews.length, expectedNumReviewers)
+	end
 end

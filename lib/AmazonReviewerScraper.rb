@@ -3,6 +3,7 @@ require 'open-uri'
 
 class AmazonReviewerScraper
 	attr_reader :reviewers
+	attr_reader :reviews
 
 	def initialize(params = {})
 
@@ -10,6 +11,7 @@ class AmazonReviewerScraper
 		@maxPages = params.fetch(:maxPages, 1)
 		@numPages = 1
 		@reviewers = Array.new
+		@reviews = Array.new
 
 		@reviewPageUrl = @baseUrl + "/review/top-reviewers?page="
 		@productReviewsPageUrl = @baseUrl + "/product-reviews/%s/?pageNumber=%d"
@@ -84,8 +86,44 @@ class AmazonReviewerScraper
 		return reviewer
 	end
 
-	def ParseASINReviews(asin)
-		# http://www.amazon.co.uk/product-reviews/B0050CJNO2/?pageNumber=2
+	def ParseASINReviews(asin, pageNumber = 1)
+
+		# Get review page
+		pageUrl = GetProductReviewPage(asin, pageNumber)
+
+		# Scrape reviewers
+		ScrapeProductReviewers(pageUrl)
+	end
+
+	def ScrapeProductReviewers(pageUrl)
+		data = Nokogiri::HTML(open(pageUrl))
+
+		reviewsData = data.xpath("//table[@id=\"productReviews\"]/tr/td/div")
+		
+		# Iterate through each reviewer and find info on them
+		reviewsData.each do |reviewNode|
+			review = Hash.new()
+
+			# Star rating - e.g. 5.0 out of 5 stars
+			# Trim to first word (i.e. the rating) and return it as a float
+			review["numStars"] = reviewNode.xpath("./div[2]/span[1]/span/span").text.split(' ')[0...1].join('').to_f
+
+			review["author"] = reviewNode.xpath("./div[3]/div[1]/div[2]/a[1]/span").text
+			review["authorAmazonUrl"] = reviewNode.xpath("./div[3]/div[1]/div[2]/a[1]/@href").text
+			review["reviewTitle"] = reviewNode.xpath("./div[2]/span[2]/b").text
+			review["reviewDate"] = reviewNode.xpath("./div[2]/span[2]/nobr").text
+			review["verifiedPurchase"] = (!reviewNode.xpath("./div[4]/span/b").text.empty?).to_s
+
+			review["text"] = reviewNode.xpath("./text()").text.strip!
+
+			# Follow link to Amazon reviewer page to get email address
+			review["reviewer"] = ParseReviewerPage(@baseUrl + review["authorAmazonUrl"])
+			puts review
+
+			@reviews.push(review)
+		end
+
+		# TODO: Go to next page of reviews
 	end
 
 	def GetProductReviewPage(asin, pageNumber = 1)
