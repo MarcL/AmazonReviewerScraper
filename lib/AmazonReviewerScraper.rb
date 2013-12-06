@@ -125,6 +125,9 @@ class AmazonReviewerScraper
 				review["reviewerAmazonUrl"] = reviewNode.xpath("./div[2]/div[1]/div[2]/a[1]/@href").text
 			end
 
+			# Full path to the reviewer URL
+			review["reviewerAmazonUrl"] = @baseUrl + review["reviewerAmazonUrl"]
+
 			review["reviewTitle"] = reviewNode.xpath("./div[2]/span[2]/b").text
 			if (review["reviewTitle"].empty?)
 				review["reviewTitle"] = reviewNode.xpath("./div[1]/span[2]/b").text
@@ -144,7 +147,7 @@ class AmazonReviewerScraper
 
 			# Follow link to Amazon reviewer page to get email address
 			if (@parseReviewer)
-				review["reviewer"] = ParseReviewerPage(@baseUrl + review["reviewerAmazonUrl"])
+				review["reviewer"] = ParseReviewerPage(review["reviewerAmazonUrl"])
 			end
 
 			@reviews.push(review)

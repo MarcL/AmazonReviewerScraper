@@ -26,9 +26,9 @@ reviews = scraper.reviews
 
 # Write all reviews to a file
 CSV.open("#{asin}-reviews.csv", "w") do |csv|
-	csv << ["rank", "name", "numStars", "email", "website", "review"]
+	csv << ["rank", "name", "numStars", "email", "website", "reviewerAmazonUrl", "review"]
 	reviews.each { |review|
 		reviewer = review["reviewer"]
-		csv << [reviewer["rank"], review["name"], review["numStars"], reviewer["email"], reviewer["website"], review["review"]]
+		csv << [reviewer["rank"], review["name"], review["numStars"], reviewer["email"], reviewer["website"], review["reviewerAmazonUrl"], review["review"]]
 	}
 end
